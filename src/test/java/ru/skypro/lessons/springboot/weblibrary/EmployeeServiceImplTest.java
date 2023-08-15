@@ -11,6 +11,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.skypro.lessons.springboot.weblibrary.dto.EmployeeDTO;
 import ru.skypro.lessons.springboot.weblibrary.exceptions.EmployeeNotFoundExceptions;
 import ru.skypro.lessons.springboot.weblibrary.pojo.Employee;
@@ -28,8 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+@Testcontainers
 @ExtendWith(MockitoExtension.class)
 public class EmployeeServiceImplTest {
+
 
     @Mock
     private EmployeeRepositoryImpl employeeRepository;
@@ -37,7 +44,17 @@ public class EmployeeServiceImplTest {
     private EmployeeQueryRepository employeeQueryRepository;
     @InjectMocks
     private EmployeeServiceImpl employeeService;
+    @Container
+    private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
+            .withUsername("postgres")
+            .withPassword("admin");
 
+    @DynamicPropertySource
+    static void postgresProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
     @DisplayName("getHighSalaryReturned")
     @Test
     public void getHighSalaryReturnedTest () {

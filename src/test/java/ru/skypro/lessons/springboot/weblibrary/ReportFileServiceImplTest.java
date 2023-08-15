@@ -7,6 +7,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.skypro.lessons.springboot.weblibrary.pojo.ReportFile;
 import ru.skypro.lessons.springboot.weblibrary.repository.EmployeeQueryRepository;
 import ru.skypro.lessons.springboot.weblibrary.repository.ReportFileRepository;
@@ -16,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-
+@Testcontainers
 @SpringBootTest
 public class ReportFileServiceImplTest {
 
@@ -30,6 +35,17 @@ public class ReportFileServiceImplTest {
     @InjectMocks
     private ReportFileServiceImpl reportFileService;
 
+    @Container
+    private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
+            .withUsername("postgres")
+            .withPassword("admin");
+
+    @DynamicPropertySource
+    static void postgresProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
 
     @SneakyThrows
     @DisplayName("addJsonFileMethod")
