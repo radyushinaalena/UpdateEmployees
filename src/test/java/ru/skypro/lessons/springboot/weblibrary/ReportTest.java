@@ -20,7 +20,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class ReportTest {
 
-
     @Autowired
     private MockMvc mockMvc;
 
