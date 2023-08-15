@@ -63,5 +63,4 @@ public class ReportFileServiceImplTest {
         lenient().doThrow(IncorrectResultSizeDataAccessException.class).when(reportFileRepository).findById(anyInt());
         assertThrows(IncorrectResultSizeDataAccessException.class, () -> reportFileService.getSomeFileById(anyInt()));
     }
-
 }
